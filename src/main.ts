@@ -8,11 +8,12 @@ import { ValidationPipe } from '@nestjs/common';
 import jwt from 'fastify-jwt';
 import { jwtDefaultOptions } from './auth/auth.settings';
 import { USE_API_VERSION_IN_URL, API_VERSION } from './global/app.settings';
-import fastifySecureSession from 'fastify-secure-session';
+
 import { readFileSync } from 'fs';
 import * as path from 'path';
 //Below is for file upload.
 import fmp from 'fastify-multipart';
+import { fastifySecureSession } from '@fastify/secure-session';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(

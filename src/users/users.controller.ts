@@ -14,8 +14,9 @@ import {
 import { UsersService } from './users.service';
 import { User } from './models/user.entity';
 import { UpdateUserDto } from './dtos/update/updateUserdto';
-import { UpdateResult } from 'typeorm';
+import { InsertResult, UpdateResult } from 'typeorm';
 import { Request } from 'src/global/custom.interfaces';
+import { CreateUserDtos } from './dtos/create/createUserdto';
 
 @Controller('users')
 export class UsersController {
@@ -46,6 +47,7 @@ export class UsersController {
    * @param id
    *
    */
+  @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<User> {
     return this.usersService.findOne(id);
   }
@@ -59,6 +61,19 @@ export class UsersController {
   //TODO: still to find out why CreateUserDto as type is failing below. I am using User meanwhile
   create(@Body() createUserDto: User, @Req() req: Request): Promise<User> {
     return this.usersService.create(createUserDto, req);
+  }
+
+  /**
+   * Post multiple users
+   * @param createUserDtos
+   * @param req
+   */
+  @Post('insert')
+  insert(
+    @Body() createUserDtos: CreateUserDtos,
+    @Req() req: Request,
+  ): Promise<InsertResult> {
+    return this.usersService.insertUsers(createUserDtos.dtos, req);
   }
 
   /**

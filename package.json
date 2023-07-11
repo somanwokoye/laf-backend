@@ -21,6 +21,8 @@
   },
   "dependencies": {
     "@fastify/jwt": "^7.2.0",
+    "@fastify/secure-session": "^6.1.0",
+    "@fastify/swagger": "^8.8.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^10.0.0",
@@ -39,7 +41,6 @@
     "fastify-flash": "^2.0.2",
     "fastify-jwt": "^3.1.0",
     "fastify-multipart": "^5.0.0",
-    "fastify-secure-session": "^2.3.1",
     "fastify-static": "^4.2.3",
     "fastify-swagger": "^4.12.0",
     "googleapis": "^118.0.0",

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectConnection, InjectRepository } from '@nestjs/typeorm';
-import { Connection, Repository, UpdateResult } from 'typeorm';
+import { Connection, InsertResult, Repository, UpdateResult } from 'typeorm';
 import { User } from './models/user.entity';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dtos/create/createUserdto';
@@ -125,6 +125,71 @@ export class UsersService {
           {
             status: HttpStatus.INTERNAL_SERVER_ERROR,
             error: `There was a problem with user creation: ${error.message}`,
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    }
+  }
+
+  //insert using query builder - more efficient than save. Can be used for single or bulk save. See https://github.com/typeorm/typeorm/blob/master/docs/insert-query-builder.md
+  async insertUsers(
+    users: CreateUserDto[],
+    req: Request,
+  ): Promise<InsertResult> {
+    //users is an array of objects
+    try {
+      //iteratively hash the passwords
+      // eslint-disable-next-line prefer-const
+      let usersWithHashedPasswords = [];
+      users.map(async (user) => {
+        //hash the password in dto
+        await bcrypt.hash(user.passwordHash, 10).then((hash: string) => {
+          user.passwordHash = hash;
+          usersWithHashedPasswords.push(user);
+        });
+      });
+      const insertResult = await this.userRepository
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values(usersWithHashedPasswords)
+        .execute();
+
+      /* //Get the users with id before adding to elastic search index, without await
+      users.map((user) => {
+        this.findByPrimaryEmailAddress(user.primaryEmailAddress).then(
+          (user: User) => {
+            this.usersSearchService.indexUser(user);
+          },
+        );
+      }); */
+
+      //iteratively call confirmEmailRequest() for users without await.
+      if (AUTO_SEND_CONFIRM_EMAIL) {
+        users.map((user) => {
+          this.confirmEmailRequest(user.primaryEmailAddress, null, true, req);
+        });
+      }
+
+      //remove any cache named users
+      await this.connection.queryResultCache.remove(['users']);
+
+      return insertResult;
+    } catch (error) {
+      if (error && error.code === PG_UNIQUE_CONSTRAINT_VIOLATION) {
+        throw new HttpException(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: `There was a problem with user(s) insertion: : ${error.message}`,
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      } else {
+        throw new HttpException(
+          {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            error: `There was a problem with user(s) insertion: ${error.message}`,
           },
           HttpStatus.INTERNAL_SERVER_ERROR,
         );

@@ -19,3 +19,8 @@ export interface AuthTokenPayload {
     roles?: string[];
   };
 }
+
+export enum ItemStatus {
+  CLAIMED = 'claimed',
+  AVAILABLE = 'available',
+}

@@ -1,6 +1,8 @@
 import { BaseAbstractEntity } from 'src/global/base-abstract-entity';
-import { Column, Index } from 'typeorm';
+import { Item } from 'src/items/models/item.entity';
+import { Column, Entity, Index, JoinTable, OneToMany } from 'typeorm';
 
+@Entity()
 export class User extends BaseAbstractEntity {
   @Column()
   firstName: string;
@@ -62,6 +64,10 @@ export class User extends BaseAbstractEntity {
 
   @Column({ nullable: true })
   otpSecret: string;
+
+  @OneToMany((type) => Item, (item) => item.createdBy)
+  @JoinTable()
+  finderForWhichItems: string;
 
   /** for refresh token save after successful login*/
   @Column({ select: false, nullable: true })

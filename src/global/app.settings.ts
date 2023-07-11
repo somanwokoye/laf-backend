@@ -14,7 +14,7 @@ It is used to get the particulars of Gmail account for SMTP mailer
 //Better to use only the parsed env variables rather than keep calling process.env which is more expensive
 
 import { oauth2 } from 'googleapis/build/src/apis/oauth2';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
 //load and export parsedEnv for use in other modules
 export const parsedEnv = dotenv.config().parsed; //only load what has been parsed from .env file
 

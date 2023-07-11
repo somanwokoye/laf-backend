@@ -29,3 +29,6 @@ export class CreateUserDto {
 
   readonly isPasswordChangeRequired?: boolean;
 }
+export class CreateUserDtos {
+  dtos: CreateUserDto[];
+}
