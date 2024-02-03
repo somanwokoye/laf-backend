@@ -24,7 +24,7 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Lost and Found Api built with [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
 ## Installation
 
